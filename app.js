@@ -786,6 +786,7 @@ function extractInfo(lines, keywords, defaultValue) {
 function extractWorkExperience(lines) {
     const exp = [];
     let capture = false;
+    let linesCaptured = 0;
     
     for (const line of lines) {
         if (line.includes('工作经历') || line.includes('工作经验')) {
@@ -795,8 +796,12 @@ function extractWorkExperience(lines) {
         if (capture && (line.includes('教育') || line.includes('技能') || line.includes('项目'))) {
             break;
         }
-        if (capture && line.trim().length > 5) {
+        if (capture && line.trim().length > 5 && line.trim().length < 100) {
             exp.push(line.trim());
+            linesCaptured++;
+            if (linesCaptured >= 5) {
+                break;
+            }
         }
     }
     
@@ -806,6 +811,7 @@ function extractWorkExperience(lines) {
 function extractSkills(lines) {
     const skills = [];
     let capture = false;
+    let skillsCaptured = 0;
     
     for (const line of lines) {
         if (line.includes('技能') || line.includes('专业技能')) {
@@ -815,8 +821,12 @@ function extractSkills(lines) {
         if (capture && (line.includes('工作') || line.includes('教育') || line.includes('项目'))) {
             break;
         }
-        if (capture && line.trim().length > 2) {
+        if (capture && line.trim().length > 2 && line.trim().length < 50) {
             skills.push(line.trim());
+            skillsCaptured++;
+            if (skillsCaptured >= 5) {
+                break;
+            }
         }
     }
     
@@ -912,22 +922,22 @@ function generatePersonalizedOpeners() {
     const skills = candidateInfo['技能'];
     
     if (name && name !== '未知') {
-        openers.push(`"${name}你好！感谢你抽出时间来沟通，先简单介绍一下你自己吧？"`);
+        openers.push(`"${name}你好！感谢你抽出时间来参加这次初面。先简单介绍一下你自己吧？"`);
     } else {
-        openers.push('"你好！感谢你抽出时间来沟通，先简单介绍一下你自己吧？"');
+        openers.push('"你好！感谢你抽出时间来参加这次初面。先简单介绍一下你自己吧？"');
     }
     
     if (workExp && workExp.length > 0) {
-        const firstExp = workExp[0].substring(0, 30);
-        openers.push(`"看到你在${firstExp}...有相关经历，能先聊聊这部分吗？"`);
+        const firstExp = workExp[0].substring(0, 25);
+        openers.push(`"注意到你有${firstExp}...相关经验，这和我们的岗位很匹配。能详细说说这部分经历吗？"`);
     }
     
     if (skills && skills.length > 0) {
-        const skillList = skills.slice(0, 2).join('、');
-        openers.push(`"注意到你熟悉${skillList}，能说说你是怎么掌握这些技能的吗？"`);
+        const skillList = skills.slice(0, 2).join('和');
+        openers.push(`"简历上提到你掌握${skillList}，这些技能在工作中是如何应用的？"`);
     }
     
-    openers.push('"能否和我讲讲你目前主要负责哪些工作？"');
+    openers.push('"能否和我讲讲你目前的主要工作职责和日常工作内容？"');
     
     return openers;
 }
@@ -937,18 +947,19 @@ function generateWorkExpQuestions() {
     const workExp = candidateInfo['工作经历'];
     
     workExp.slice(0, 2).forEach((exp, index) => {
-        const shortExp = exp.substring(0, 40);
+        const shortExp = exp.substring(0, 35);
         if (index === 0) {
-            questions.push(`"在${shortExp}...这段经历中，你主要负责什么？"`);
-            questions.push('"能分享一个你参与过的最有代表性的项目吗？"');
-            questions.push('"在这个项目中，你遇到的最大挑战是什么？怎么解决的？"');
+            questions.push(`"在${shortExp}...这段经历中，你的核心职责是什么？"`);
+            questions.push('"能分享一个你主导或深度参与的重要项目吗？"');
+            questions.push('"在这个项目中，你遇到过的最大困难是什么？最终是如何解决的？"');
+            questions.push('"通过这个项目，你取得了哪些具体成果或业绩？"');
         } else {
-            questions.push(`"关于${shortExp}...这段经历，能简单介绍一下吗？"`);
+            questions.push(`"关于${shortExp}...这段经历，能简要介绍一下吗？"`);
         }
     });
     
-    questions.push('"从你的工作经历来看，你觉得自己最大的成长是什么？"');
-    questions.push('"在之前的工作中，你最有成就感的事情是什么？"');
+    questions.push('"回顾你的职业经历，你认为自己最大的成长和提升是什么？"');
+    questions.push('"在之前的工作中，最让你有成就感的一件事是什么？"');
     
     return questions;
 }
@@ -958,18 +969,18 @@ function generateSkillQuestions() {
     const skills = candidateInfo['技能'];
     
     skills.slice(0, 3).forEach((skill, index) => {
-        questions.push(`"关于${skill}，你在实际工作中是如何应用的？能举个例子吗？"`);
+        questions.push(`"关于${skill}，能分享一个你在工作中实际应用的案例吗？"`);
         if (index === 0) {
-            questions.push(`"在${skill}方面，你觉得自己的熟练度如何？有什么具体成果吗？"`);
+            questions.push(`"在${skill}方面，你认为自己的专业程度如何？有哪些可量化的成果？"`);
         }
     });
     
     if (skills.length > 1) {
         const skillList = skills.slice(0, 3).join('、');
-        questions.push(`"在${skillList}这些技能中，你最擅长哪一项？为什么？"`);
+        questions.push(`"在${skillList}这些技能中，哪一项是你的核心优势？能具体说明吗？"`);
     }
     
-    questions.push('"除了简历上提到的，你还有其他想让我们了解的技能吗？"');
+    questions.push('"除了简历上列出的技能，你还有其他专长或能力想让我们了解吗？"');
     
     return questions;
 }
@@ -1177,24 +1188,32 @@ async function testApiConnection() {
 
 function initDragDrop() {
     const area = resumeUploadArea;
-    if (!area) return;
+    if (!area) {
+        console.log('Resume upload area not found');
+        return;
+    }
+    
+    console.log('Initializing drag-and-drop for resume upload');
     
     area.addEventListener('dragenter', (e) => {
         e.preventDefault();
         e.stopPropagation();
         area.classList.add('dragover');
+        console.log('Drag enter');
     });
     
     area.addEventListener('dragover', (e) => {
         e.preventDefault();
         e.stopPropagation();
         area.classList.add('dragover');
+        console.log('Drag over');
     });
     
     area.addEventListener('dragleave', (e) => {
         e.preventDefault();
         e.stopPropagation();
         area.classList.remove('dragover');
+        console.log('Drag leave');
     });
     
     area.addEventListener('drop', (e) => {
@@ -1202,8 +1221,12 @@ function initDragDrop() {
         e.stopPropagation();
         area.classList.remove('dragover');
         
+        console.log('Drop event');
         const files = e.dataTransfer.files;
+        console.log('Files dropped:', files.length);
+        
         if (files && files.length > 0) {
+            console.log('Handling file:', files[0].name);
             handleResumeUpload(files[0]);
         }
     });
