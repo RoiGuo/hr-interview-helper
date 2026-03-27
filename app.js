@@ -141,7 +141,7 @@ const API_PRESETS = {
         defaultModel: 'claude-3-sonnet-20240229'
     },
     hunyuan: {
-        endpoint: 'https://hunyuan.tencentcloudapi.com',
+        endpoint: 'https://api.hunyuan.cloud.tencent.com/v1/chat/completions',
         defaultModel: 'hunyuan-lite'
     },
     'hunyuan-proxy': {
