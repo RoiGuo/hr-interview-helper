@@ -1189,13 +1189,13 @@ function initDragDrop() {
     
     ['dragenter', 'dragover'].forEach(eventName => {
         area.addEventListener(eventName, () => {
-            area.classList.add('drag-over');
+            area.classList.add('dragover');
         }, false);
     });
     
     ['dragleave', 'drop'].forEach(eventName => {
         area.addEventListener(eventName, () => {
-            area.classList.remove('drag-over');
+            area.classList.remove('dragover');
         }, false);
     });
     
