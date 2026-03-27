@@ -1,0 +1,7 @@
+{
+  "name": "hr-interview-api-proxy",
+  "version": "1.0.0",
+  "description": "API proxy for HR Interview Helper",
+  "dependencies": {},
+  "devDependencies": {}
+}

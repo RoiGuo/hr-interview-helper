@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "routes": [
+    {
+      "src": "/api/chat",
+      "dest": "/api/chat.js"
+    }
+  ],
+  "env": {
+    "HUNYUAN_SECRET_ID": "@hunyuan_secret_id",
+    "HUNYUAN_SECRET_KEY": "@hunyuan_secret_key"
+  }
+}

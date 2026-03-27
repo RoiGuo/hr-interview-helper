@@ -15,7 +15,7 @@
             <h1>🎙️ HR面试助手 - 首次电话沟通</h1>
         </header>
 
-        <div class="control-panel">
+        <div class="controls">
             <button id="startBtn" class="btn btn-primary">
                 <span class="icon">▶️</span> 开始录音
             </button>
@@ -25,34 +25,34 @@
             <button id="clearBtn" class="btn btn-secondary">
                 <span class="icon">🗑️</span> 清空
             </button>
-            <button id="exportBtn" class="btn btn-info">
-                <span class="icon">�</span> 导出报告
+            <button id="exportBtn" class="btn btn-secondary">
+                <span class="icon">📄</span> 导出报告
             </button>
-            <button id="toggleSettingsBtn" class="btn btn-small">⚙️ API配置</button>
+            <button id="toggleSettingsBtn" class="btn btn-small btn-secondary">⚙️ API配置</button>
         </div>
 
-        <div class="resume-panel">
+        <div class="resume-section">
             <div class="resume-upload-area" id="resumeUploadArea">
-                <div class="upload-icon">📄</div>
+                <div class="resume-upload-icon">📄</div>
                 <h3>上传候选人简历</h3>
-                <p>支持拖拽或点击上传，格式：PDF、TXT、JPG、PNG</p>
+                <p class="resume-upload-text">支持拖拽或点击上传，格式：PDF、TXT、JPG、PNG</p>
                 <input type="file" id="resumeInput" accept=".txt,.pdf,.jpg,.jpeg,.png,.webp" style="display: none;">
                 <button id="uploadResumeBtn" class="btn btn-primary btn-small">选择文件</button>
                 <div class="upload-progress" id="uploadProgress" style="display: none;">
                     <div class="progress-bar">
                         <div class="progress-fill" id="progressFill"></div>
                     </div>
-                    <p id="progressText">正在处理...</p>
+                    <p class="progress-text" id="progressText">正在处理...</p>
                 </div>
             </div>
             <div class="resume-info" id="resumeInfo" style="display: none;">
                 <div class="resume-header">
                     <h3>📋 候选人信息</h3>
-                    <button id="reuploadResumeBtn" class="btn btn-small">重新上传</button>
+                    <button id="reuploadResumeBtn" class="btn btn-small btn-secondary">重新上传</button>
                 </div>
                 <div id="candidateInfo" class="candidate-info-box"></div>
                 <h3>💡 HR首次沟通建议</h3>
-                <div id="hrSuggestions" class="suggestions-box"></div>
+                <div id="hrSuggestions" class="hr-suggestions-box"></div>
             </div>
         </div>
 
@@ -64,6 +64,8 @@
                     <option value="custom">自定义</option>
                     <option value="openai">OpenAI</option>
                     <option value="anthropic">Anthropic</option>
+                    <option value="hunyuan">腾讯混元</option>
+                    <option value="hunyuan-proxy">混元代理(推荐分享)</option>
                 </select>
             </div>
             <div class="api-config-group">
@@ -90,6 +92,10 @@
             <div class="status-indicator" id="statusIndicator">
                 <span class="status-dot"></span>
                 <span id="statusText">准备就绪</span>
+            </div>
+            <div id="speakerIndicator" class="speaker-indicator">
+                <span class="speaker-dot"></span>
+                <span id="currentSpeakerText">当前：等待开始</span>
             </div>
             <div class="timer" id="timer">00:00:00</div>
             <div class="summary-status" id="summaryStatus">自动总结已启用 (每3秒)</div>
@@ -145,9 +151,9 @@
                     <div id="summary" class="summary-box">开始录音后，这里会自动显示通话总结...</div>
                 </div>
 
-                <div class="followup-section">
+                <div class="followup-points-section">
                     <h2>💬 建议延伸聊点</h2>
-                    <div id="followupPoints" class="followup-box">上传简历并开始面试后，这里会显示建议的延伸聊点...</div>
+                    <div id="followupPoints" class="followup-points-box">上传简历并开始面试后，这里会显示建议的延伸聊点...</div>
                 </div>
             </div>
         </div>
