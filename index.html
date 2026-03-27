@@ -1,0 +1,158 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR面试助手 - 首次电话沟通</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.0.4/dist/tesseract.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎙️ HR面试助手 - 首次电话沟通</h1>
+        </header>
+
+        <div class="control-panel">
+            <button id="startBtn" class="btn btn-primary">
+                <span class="icon">▶️</span> 开始录音
+            </button>
+            <button id="stopBtn" class="btn btn-danger" disabled>
+                <span class="icon">⏹️</span> 停止录音
+            </button>
+            <button id="clearBtn" class="btn btn-secondary">
+                <span class="icon">🗑️</span> 清空
+            </button>
+            <button id="exportBtn" class="btn btn-info">
+                <span class="icon">�</span> 导出报告
+            </button>
+            <button id="toggleSettingsBtn" class="btn btn-small">⚙️ API配置</button>
+        </div>
+
+        <div class="resume-panel">
+            <div class="resume-upload-area" id="resumeUploadArea">
+                <div class="upload-icon">📄</div>
+                <h3>上传候选人简历</h3>
+                <p>支持拖拽或点击上传，格式：PDF、TXT、JPG、PNG</p>
+                <input type="file" id="resumeInput" accept=".txt,.pdf,.jpg,.jpeg,.png,.webp" style="display: none;">
+                <button id="uploadResumeBtn" class="btn btn-primary btn-small">选择文件</button>
+                <div class="upload-progress" id="uploadProgress" style="display: none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <p id="progressText">正在处理...</p>
+                </div>
+            </div>
+            <div class="resume-info" id="resumeInfo" style="display: none;">
+                <div class="resume-header">
+                    <h3>📋 候选人信息</h3>
+                    <button id="reuploadResumeBtn" class="btn btn-small">重新上传</button>
+                </div>
+                <div id="candidateInfo" class="candidate-info-box"></div>
+                <h3>💡 HR首次沟通建议</h3>
+                <div id="hrSuggestions" class="suggestions-box"></div>
+            </div>
+        </div>
+
+        <div class="api-config-panel" id="apiConfigPanel" style="display: none;">
+            <h3>🔑 API配置</h3>
+            <div class="api-config-group">
+                <label for="apiProvider">API提供商:</label>
+                <select id="apiProvider" class="input-select">
+                    <option value="custom">自定义</option>
+                    <option value="openai">OpenAI</option>
+                    <option value="anthropic">Anthropic</option>
+                </select>
+            </div>
+            <div class="api-config-group">
+                <label for="apiEndpoint">API端点:</label>
+                <input type="text" id="apiEndpoint" placeholder="https://api.example.com/v1/chat/completions" class="input-text">
+            </div>
+            <div class="api-config-group">
+                <label for="apiKey">API密钥:</label>
+                <input type="password" id="apiKey" placeholder="sk-..." class="input-text">
+            </div>
+            <div class="api-config-group">
+                <label for="apiModel">模型:</label>
+                <input type="text" id="apiModel" placeholder="gpt-4" class="input-text">
+            </div>
+            <div class="api-config-group">
+                <label for="systemPrompt">系统提示词:</label>
+                <textarea id="systemPrompt" rows="3" placeholder="你是一个专业的HR面试助手..." class="input-textarea"></textarea>
+            </div>
+            <button id="saveApiConfigBtn" class="btn btn-primary btn-small">保存配置</button>
+            <button id="testApiConfigBtn" class="btn btn-secondary btn-small">测试连接</button>
+        </div>
+
+        <div class="status-panel">
+            <div class="status-indicator" id="statusIndicator">
+                <span class="status-dot"></span>
+                <span id="statusText">准备就绪</span>
+            </div>
+            <div class="timer" id="timer">00:00:00</div>
+            <div class="summary-status" id="summaryStatus">自动总结已启用 (每3秒)</div>
+        </div>
+
+        <div class="first-call-panel">
+            <h3>📞 首次电话沟通追踪</h3>
+            <div class="call-tracking-grid">
+                <div class="tracking-item">
+                    <h4>💼 当前工作内容</h4>
+                    <div id="workContentStatus" class="status-badge status-pending">未涉及</div>
+                    <div id="workContentDetails" class="tracking-details"></div>
+                </div>
+                <div class="tracking-item">
+                    <h4>🛠️ 专业技能</h4>
+                    <div id="skillStatus" class="status-badge status-pending">未涉及</div>
+                    <div id="skillDetails" class="tracking-details"></div>
+                </div>
+                <div class="tracking-item">
+                    <h4>💬 沟通能力</h4>
+                    <div id="communicationStatus" class="status-badge status-pending">评估中</div>
+                    <div id="communicationDetails" class="tracking-details"></div>
+                </div>
+                <div class="tracking-item">
+                    <h4>🧩 问题解决能力</h4>
+                    <div id="problemSolvingStatus" class="status-badge status-pending">未涉及</div>
+                    <div id="problemSolvingDetails" class="tracking-details"></div>
+                </div>
+                <div class="tracking-item">
+                    <h4>💰 薪资期望</h4>
+                    <div id="salaryStatus" class="status-badge status-pending">未询问</div>
+                    <div id="salaryDetails" class="tracking-details"></div>
+                </div>
+                <div class="tracking-item">
+                    <h4>🚪 离职原因</h4>
+                    <div id="leaveReasonStatus" class="status-badge status-pending">未询问</div>
+                    <div id="leaveReasonDetails" class="tracking-details"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <div class="left-column">
+                <div class="transcript-section">
+                    <h2>📄 实时转录</h2>
+                    <div id="transcript" class="transcript-box"></div>
+                </div>
+            </div>
+
+            <div class="right-column">
+                <div class="summary-section">
+                    <h2>📋 实时总结 (每3秒自动更新)</h2>
+                    <div id="summary" class="summary-box">开始录音后，这里会自动显示通话总结...</div>
+                </div>
+
+                <div class="followup-section">
+                    <h2>💬 建议延伸聊点</h2>
+                    <div id="followupPoints" class="followup-box">上传简历并开始面试后，这里会显示建议的延伸聊点...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
