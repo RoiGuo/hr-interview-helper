@@ -825,20 +825,8 @@ function extractSkills(lines) {
 
 function displayCandidateInfo() {
     let html = '<div style="margin-bottom: 15px;">';
-    
-    for (const [key, value] of Object.entries(candidateInfo)) {
-        if (key === '工作经历' || key === '技能') {
-            html += `<p><strong>${key}：</strong></p>`;
-            html += '<ul style="margin-left: 20px; margin-top: 5px; margin-bottom: 10px;">';
-            value.forEach(item => {
-                html += `<li>${item}</li>`;
-            });
-            html += '</ul>';
-        } else {
-            html += `<p><strong>${key}：</strong>${value}</p>`;
-        }
-    }
-    
+    html += '<p style="color: #34c759; font-weight: 600;">✅ 简历已成功解析</p>';
+    html += '<p style="color: #86868b; font-size: 14px; margin-top: 8px;">已基于简历内容生成个性化沟通建议</p>';
     html += '</div>';
     candidateInfoBox.innerHTML = html;
 }
@@ -846,35 +834,58 @@ function displayCandidateInfo() {
 function generateHRSuggestions() {
     let suggestions = [];
     
-    suggestions.push({
-        title: '🎯 首次沟通重点',
-        items: [
-            '确认候选人当前的具体工作内容和职责',
-            '了解候选人的核心专业技能和熟练度',
-            '评估候选人的沟通表达能力和逻辑思维',
-            '询问候选人的薪资期望范围',
-            '了解候选人的离职原因和求职动机'
-        ]
-    });
+    const hasName = candidateInfo && candidateInfo['姓名'] && candidateInfo['姓名'] !== '未知';
+    const hasWorkExp = candidateInfo && candidateInfo['工作经历'] && candidateInfo['工作经历'].length > 0;
+    const hasSkills = candidateInfo && candidateInfo['技能'] && candidateInfo['技能'].length > 0;
+    const hasAge = candidateInfo && candidateInfo['年龄'] && candidateInfo['年龄'] !== '未知';
+    const hasEducation = candidateInfo && candidateInfo['学历'] && candidateInfo['学历'] !== '未知';
     
-    suggestions.push({
-        title: '💬 推荐破冰话术',
-        items: [
-            '"你好！感谢你抽出时间来沟通，先简单介绍一下你自己吧？"',
-            '"能否和我讲讲你目前主要负责哪些工作？"',
-            '"在工作中，你最擅长的技能是什么？能举个例子吗？"',
-            '"方便问一下，你对薪资有什么期望吗？"',
-            '"是什么原因让你考虑换工作呢？"'
-        ]
-    });
-    
-    if (candidateInfo && candidateInfo['工作经历']) {
+    if (hasName || hasWorkExp || hasSkills) {
         suggestions.push({
-            title: '🔍 基于简历的深入问题',
+            title: '👋 个性化开场白',
+            items: generatePersonalizedOpeners()
+        });
+    }
+    
+    suggestions.push({
+        title: '🎯 核心沟通重点',
+        items: [
+            '请详细介绍一下你目前的工作内容和职责范围',
+            '你每天的主要工作任务有哪些？能举个典型例子吗？',
+            '在当前岗位上，你觉得自己最核心的能力是什么？'
+        ]
+    });
+    
+    if (hasWorkExp) {
+        suggestions.push({
+            title: '💼 深入了解工作经历',
+            items: generateWorkExpQuestions()
+        });
+    }
+    
+    if (hasSkills) {
+        suggestions.push({
+            title: '🛠️ 技能验证与挖掘',
+            items: generateSkillQuestions()
+        });
+    }
+    
+    suggestions.push({
+        title: '💰 薪资与离职',
+        items: [
+            '方便问一下，你对下一份工作的薪资期望范围是多少？',
+            '除了薪资，你还关注哪些福利待遇？',
+            '是什么原因让你考虑离开现在的工作？',
+            '你在寻找新机会时，最看重的是什么？'
+        ]
+    });
+    
+    if (hasEducation) {
+        suggestions.push({
+            title: '🎓 教育背景',
             items: [
-                `从你的经历来看，你在${candidateInfo['工作经历'][0] || '相关领域'}有经验，能否分享一个代表性项目？`,
-                '在简历提到的这些技能中，你最擅长哪一项？在实际工作中如何应用？',
-                '根据你的背景，你觉得自己应聘这个岗位的最大优势是什么？'
+                `能简单介绍一下你的${candidateInfo['学历']}学习经历吗？`,
+                '在校期间，哪些课程或经历对你帮助最大？'
             ]
         });
     }
@@ -892,6 +903,75 @@ function generateHRSuggestions() {
     });
     
     hrSuggestionsBox.innerHTML = html;
+}
+
+function generatePersonalizedOpeners() {
+    const openers = [];
+    const name = candidateInfo['姓名'];
+    const workExp = candidateInfo['工作经历'];
+    const skills = candidateInfo['技能'];
+    
+    if (name && name !== '未知') {
+        openers.push(`"${name}你好！感谢你抽出时间来沟通，先简单介绍一下你自己吧？"`);
+    } else {
+        openers.push('"你好！感谢你抽出时间来沟通，先简单介绍一下你自己吧？"');
+    }
+    
+    if (workExp && workExp.length > 0) {
+        const firstExp = workExp[0].substring(0, 30);
+        openers.push(`"看到你在${firstExp}...有相关经历，能先聊聊这部分吗？"`);
+    }
+    
+    if (skills && skills.length > 0) {
+        const skillList = skills.slice(0, 2).join('、');
+        openers.push(`"注意到你熟悉${skillList}，能说说你是怎么掌握这些技能的吗？"`);
+    }
+    
+    openers.push('"能否和我讲讲你目前主要负责哪些工作？"');
+    
+    return openers;
+}
+
+function generateWorkExpQuestions() {
+    const questions = [];
+    const workExp = candidateInfo['工作经历'];
+    
+    workExp.slice(0, 2).forEach((exp, index) => {
+        const shortExp = exp.substring(0, 40);
+        if (index === 0) {
+            questions.push(`"在${shortExp}...这段经历中，你主要负责什么？"`);
+            questions.push('"能分享一个你参与过的最有代表性的项目吗？"');
+            questions.push('"在这个项目中，你遇到的最大挑战是什么？怎么解决的？"');
+        } else {
+            questions.push(`"关于${shortExp}...这段经历，能简单介绍一下吗？"`);
+        }
+    });
+    
+    questions.push('"从你的工作经历来看，你觉得自己最大的成长是什么？"');
+    questions.push('"在之前的工作中，你最有成就感的事情是什么？"');
+    
+    return questions;
+}
+
+function generateSkillQuestions() {
+    const questions = [];
+    const skills = candidateInfo['技能'];
+    
+    skills.slice(0, 3).forEach((skill, index) => {
+        questions.push(`"关于${skill}，你在实际工作中是如何应用的？能举个例子吗？"`);
+        if (index === 0) {
+            questions.push(`"在${skill}方面，你觉得自己的熟练度如何？有什么具体成果吗？"`);
+        }
+    });
+    
+    if (skills.length > 1) {
+        const skillList = skills.slice(0, 3).join('、');
+        questions.push(`"在${skillList}这些技能中，你最擅长哪一项？为什么？"`);
+    }
+    
+    questions.push('"除了简历上提到的，你还有其他想让我们了解的技能吗？"');
+    
+    return questions;
 }
 
 function updateFollowupPoints() {
