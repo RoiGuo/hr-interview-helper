@@ -1177,35 +1177,36 @@ async function testApiConnection() {
 
 function initDragDrop() {
     const area = resumeUploadArea;
+    if (!area) return;
     
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        area.addEventListener(eventName, preventDefaults, false);
-    });
-    
-    function preventDefaults(e) {
+    area.addEventListener('dragenter', (e) => {
         e.preventDefault();
         e.stopPropagation();
-    }
-    
-    ['dragenter', 'dragover'].forEach(eventName => {
-        area.addEventListener(eventName, () => {
-            area.classList.add('dragover');
-        }, false);
+        area.classList.add('dragover');
     });
     
-    ['dragleave', 'drop'].forEach(eventName => {
-        area.addEventListener(eventName, () => {
-            area.classList.remove('dragover');
-        }, false);
+    area.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        area.classList.add('dragover');
+    });
+    
+    area.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        area.classList.remove('dragover');
     });
     
     area.addEventListener('drop', (e) => {
-        const dt = e.dataTransfer;
-        const files = dt.files;
-        if (files.length > 0) {
+        e.preventDefault();
+        e.stopPropagation();
+        area.classList.remove('dragover');
+        
+        const files = e.dataTransfer.files;
+        if (files && files.length > 0) {
             handleResumeUpload(files[0]);
         }
-    }, false);
+    });
 }
 
 startBtn.addEventListener('click', startRecording);
